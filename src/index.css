@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --color-gold-300: #fde047;
+  --color-gold-400: #facc15;
+  --color-gold-500: #eab308;
+  --color-gold-600: #ca8a04;
+  --color-forest-950: #070c09;
+  --color-forest-900: #0b1410;
+  --color-forest-850: #0f1c16;
+  --color-forest-800: #13241d;
+  --color-forest-700: #1c362b;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #070c09;
+  color: #f1f5f3;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #070c09;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(13, 22, 17, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(250, 204, 21, 0.15);
+}
+
+.glass-panel-subtle {
+  background: rgba(13, 22, 17, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  background: rgba(18, 30, 24, 0.82);
+  border-color: rgba(250, 204, 21, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(234, 179, 8, 0.2);
+}
+
+/* Golden glowing effects */
+.glow-gold {
+  box-shadow: 0 0 25px -4px rgba(234, 179, 8, 0.45);
+}
+
+.glow-gold-pulse {
+  animation: goldPulse 2.8s infinite ease-in-out;
+}
+
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px 2px rgba(234, 179, 8, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 30px 6px rgba(234, 179, 8, 0.75);
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #09100d;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f372a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c69214;
+}
+
+/* Hide scrollbar for clean touch carousel scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
