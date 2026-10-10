@@ -129,7 +129,7 @@ export const Footer: React.FC = () => {
             </div>
 
             <div className="text-[11px] text-neutral-500 font-mono">
-              <span>Trip Route: Indore (0 km) → Jaam Gate (50 km) → Maheshwar (100 km) → Sahastradhara (6 km)</span>
+              <span>Trip Route: Indore (0 km) → Jaam Gate (50 km) → Maheshwar (100 km) → Sahastradhara (110 km)</span>
             </div>
           </div>
         </div>

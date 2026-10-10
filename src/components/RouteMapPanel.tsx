@@ -16,7 +16,7 @@ export const RouteMapPanel: React.FC<RouteMapPanelProps> = ({
     {
       id: 'sahastradhara',
       name: 'Sahastradhara',
-      distanceLabel: '(6 km)',
+      distanceLabel: '(110 km)',
       x: 42,
       y: 18
     },

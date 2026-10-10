@@ -108,7 +108,7 @@ export const DestinationDetailPopover: React.FC<DestinationDetailPopoverProps> =
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono shrink-0">
                 <span className="text-amber-300 font-bold bg-amber-500/20 border border-amber-400/30 px-2 py-0.5 rounded-full">
-                  {isJaamGate ? '50 km from Indore' : `${destination.distanceFromIndore} from Indore`}
+                  {destination.modalDistanceLabel || (isJaamGate ? '50 km from Indore' : `${destination.distanceFromIndore} from Indore`)}
                 </span>
                 <span className="text-neutral-400 font-medium">({destination.day})</span>
               </div>

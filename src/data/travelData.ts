@@ -176,13 +176,106 @@ export const DESTINATIONS: Destination[] = [
   {
     id: 'sahastradhara',
     name: 'Sahastradhara',
-    distanceFromIndore: '6 km',
+    distanceFromIndore: '110 km',
+    modalDistanceLabel: '6 km from Maheshwar',
     day: 'Day 2',
     shortDesc:
       'Captivating river landscape where the Narmada breaks into hundreds of rushing streams and sparkling cascades over dark volcanic basalt rock channels.',
-    thumbnail: '/assets/sahastradhara.jpg',
+    thumbnail: '/assets/sahastradhara/sahastradhara_aerial_landscape.jpg',
     mapX: 48,
-    mapY: 84
+    mapY: 84,
+    highlights: [
+      'A Thousand Streams',
+      'Volcanic Basalt Rocks',
+      'Ek Mukhi Datta Temple',
+      'Narmada Cascades'
+    ],
+    gallery: [
+      {
+        id: 'sahastradhara-aerial-landscape',
+        url: '/assets/sahastradhara/sahastradhara_aerial_landscape.jpg',
+        title: 'Aerial & Landscape View of Narmada',
+        category: 'AERIAL & LANDSCAPE VIEW',
+        caption: 'A thousand streams, one breathtaking landscape.',
+        description: 'See the wider landscape around the Narmada, where flowing water and rocky terrain create a distinctive natural scene.',
+        type: 'photo',
+        author: 'Ashish Gupta',
+        authorUrl: 'https://www.flickr.com/people/36853543@N00',
+        license: 'CC BY 2.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by/2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:18_expanse_of_Narmada_in_Maheshwar_(16673851680).jpg'
+      },
+      {
+        id: 'sahastradhara-river-streams',
+        url: '/assets/sahastradhara/sahastradhara_river_streams.jpg',
+        title: 'Narmada River Streams',
+        category: 'NARMADA RIVER STREAMS',
+        caption: 'Where the Narmada finds a thousand paths.',
+        description: 'Discover the flowing channels of the Narmada that give Sahastradhara its name, meaning ‘a thousand streams’.',
+        type: 'photo',
+        author: 'Dusanesurbhi',
+        authorUrl: 'https://commons.wikimedia.org/wiki/User:Dusanesurbhi',
+        license: 'CC BY-SA 4.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:View_of_Narmada_from_fort_of_maheshwar.jpg'
+      },
+      {
+        id: 'sahastradhara-rocks-water',
+        url: '/assets/sahastradhara/sahastradhara_rocks_flowing_water.jpg',
+        title: 'Rocks & Flowing Water Formations',
+        category: 'ROCKS & FLOWING WATER',
+        caption: 'Nature carved into stone and water.',
+        description: 'Get closer to the rocky riverbed and the movement of water across the natural formations.',
+        type: 'photo',
+        author: 'Ashish Gupta',
+        authorUrl: 'https://www.flickr.com/people/36853543@N00',
+        license: 'CC BY 2.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by/2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:19_expanse_of_Narmada_in_Maheshwar2_(16860201711).jpg'
+      },
+      {
+        id: 'sahastradhara-temple-heritage',
+        url: '/assets/sahastradhara/sahastradhara_temple_heritage.jpg',
+        title: 'Ek Mukhi Datta Temple, Sahastradhara',
+        category: 'TEMPLE & HERITAGE',
+        caption: 'A quiet spiritual corner near the river.',
+        description: 'Explore the temple surroundings near Sahastradhara and experience the connection between local heritage and the Narmada landscape.',
+        type: 'photo',
+        author: 'Nilrocks',
+        authorUrl: 'https://commons.wikimedia.org/wiki/User:Nilrocks',
+        license: 'CC BY-SA 3.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ek_Mukhi_Datta_Temple,Sahastradhara,Jalkoti,Maheshwar.jpg'
+      },
+      {
+        id: 'sahastradhara-riverbank-scenic',
+        url: '/assets/sahastradhara/sahastradhara_riverbank_scenic.jpg',
+        title: 'Riverbank Scenic View of Narmada',
+        category: 'RIVERBANK SCENIC VIEW',
+        caption: 'Pause beside the timeless Narmada.',
+        description: 'Take in the river from the bank, with scenic views that invite visitors to slow down and enjoy the surroundings.',
+        type: 'photo',
+        author: 'Sumit Surai',
+        authorUrl: 'https://commons.wikimedia.org/wiki/User:Sumitsurai',
+        license: 'CC BY-SA 4.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:River_Narmada_from_Maheshwar_Fort.jpg'
+      },
+      {
+        id: 'sahastradhara-golden-hour',
+        url: '/assets/sahastradhara/sahastradhara_golden_hour.jpg',
+        title: 'Golden Hour View over Narmada',
+        category: 'GOLDEN HOUR VIEW',
+        caption: 'Golden light, flowing water, peaceful moments.',
+        description: 'Experience the landscape in warm evening light, when the river and surrounding terrain create a beautiful photography setting.',
+        type: 'photo',
+        author: 'Prachee Majumder',
+        authorUrl: 'https://commons.wikimedia.org/wiki/User:Prachee_Majumder',
+        license: 'CC BY-SA 4.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lit_by_twilight_,_Narmada.jpg'
+      }
+    ]
   }
 ];
 

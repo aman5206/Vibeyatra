@@ -17,6 +17,7 @@ export interface Destination {
   id: string;
   name: string;
   distanceFromIndore: string; // Exact user-supplied label
+  modalDistanceLabel?: string;
   day: string; // "Day 1" or "Day 2"
   tagline?: string;
   shortDesc: string;

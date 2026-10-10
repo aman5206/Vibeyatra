@@ -9,8 +9,8 @@ import { defineConfig } from 'vite'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-function downloadFile(url: string, dest: string): Promise<boolean> {
-  if (fs.existsSync(dest) && fs.statSync(dest).size > 10000) {
+function downloadFile(url: string, dest: string, force = false): Promise<boolean> {
+  if (!force && fs.existsSync(dest) && fs.statSync(dest).size > 10000 && fs.statSync(dest).size !== 1177802) {
     return Promise.resolve(true)
   }
   return new Promise((resolve) => {
@@ -123,6 +123,75 @@ export default defineConfig({
             const ok = await downloadFile(item.url, dest)
             if (!ok && item.fallbackUrl) {
               await downloadFile(item.fallbackUrl, dest)
+            }
+          }
+        }
+      }
+    },
+    {
+      name: 'sync-sahastradhara-photos',
+      async buildStart() {
+        const sahastradharaDir = path.resolve(__dirname, 'public/assets/sahastradhara')
+        if (!fs.existsSync(sahastradharaDir)) {
+          fs.mkdirSync(sahastradharaDir, { recursive: true })
+        }
+
+        const sahastradharaPhotos = [
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/2/22/18_expanse_of_Narmada_in_Maheshwar_%2816673851680%29.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/18_expanse_of_Narmada_in_Maheshwar_%2816673851680%29.jpg/1094px-18_expanse_of_Narmada_in_Maheshwar_%2816673851680%29.jpg',
+            name: 'sahastradhara_aerial_landscape.jpg'
+          },
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/View_of_Narmada_from_fort_of_maheshwar.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/View_of_Narmada_from_fort_of_maheshwar.jpg/1920px-View_of_Narmada_from_fort_of_maheshwar.jpg',
+            name: 'sahastradhara_river_streams.jpg'
+          },
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/6/66/19_expanse_of_Narmada_in_Maheshwar2_%2816860201711%29.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/19_expanse_of_Narmada_in_Maheshwar2_%2816860201711%29.jpg/1094px-19_expanse_of_Narmada_in_Maheshwar2_%2816860201711%29.jpg',
+            name: 'sahastradhara_rocks_flowing_water.jpg'
+          },
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Ek_Mukhi_Datta_Temple%2CSahastradhara%2CJalkoti%2CMaheshwar.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Ek_Mukhi_Datta_Temple%2CSahastradhara%2CJalkoti%2CMaheshwar.jpg/800px-Ek_Mukhi_Datta_Temple%2CSahastradhara%2CJalkoti%2CMaheshwar.jpg',
+            name: 'sahastradhara_temple_heritage.jpg'
+          },
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/f/fd/River_Narmada_from_Maheshwar_Fort.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/River_Narmada_from_Maheshwar_Fort.jpg/1920px-River_Narmada_from_Maheshwar_Fort.jpg',
+            name: 'sahastradhara_river_bank_scenic.jpg',
+            altName: 'sahastradhara_riverbank_scenic.jpg'
+          },
+          {
+            url: 'https://upload.wikimedia.org/wikipedia/commons/3/39/Lit_by_twilight_%2C_Narmada.jpg',
+            fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Lit_by_twilight_%2C_Narmada.jpg/1920px-Lit_by_twilight_%2C_Narmada.jpg',
+            name: 'sahastradhara_golden_hour.jpg'
+          }
+        ]
+
+        const defaultSeed = path.resolve(__dirname, 'public/assets/sahastradhara.jpg')
+
+        for (const item of sahastradharaPhotos) {
+          const dest = path.join(sahastradharaDir, item.name)
+          const altDest = item.altName ? path.join(sahastradharaDir, item.altName) : null
+          
+          if (!fs.existsSync(dest) || fs.statSync(dest).size === 1177802 || fs.statSync(dest).size < 10000) {
+            let ok = await downloadFile(item.url, dest, true)
+            if (!ok && item.fallbackUrl) {
+              ok = await downloadFile(item.fallbackUrl, dest, true)
+            }
+            if (!ok && (!fs.existsSync(dest) || fs.statSync(dest).size < 1000)) {
+              if (fs.existsSync(defaultSeed)) {
+                fs.copyFileSync(defaultSeed, dest)
+              }
+            }
+          }
+          if (altDest) {
+            if (fs.existsSync(dest) && fs.statSync(dest).size > 10000) {
+              fs.copyFileSync(dest, altDest)
+            } else if (!fs.existsSync(altDest) && fs.existsSync(defaultSeed)) {
+              fs.copyFileSync(defaultSeed, altDest)
             }
           }
         }

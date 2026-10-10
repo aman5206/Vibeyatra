@@ -3,7 +3,6 @@ import {
   CalendarIcon,
   RouteIcon,
   GraduationCapIcon,
-  PlayIcon,
   ArrowRightIcon,
   MapPinIcon,
   InstagramIcon,
@@ -30,6 +29,13 @@ const DEST_PROGRESS_MAP: Record<string, number> = {
   'sahastradhara': 0.95
 };
 
+// Travel-inspired quotes for the mobile carousel
+const MOBILE_QUOTES = [
+  '“Good roads lead to great stories.”',
+  '“Collect moments, not miles.”',
+  '“The best memories begin with a journey.”'
+];
+
 export const Hero: React.FC<HeroProps> = ({
   selectedDestinationId,
   onSelectDestination,
@@ -44,6 +50,45 @@ export const Hero: React.FC<HeroProps> = ({
   const rafIdRef = useRef<number | null>(null);
   const currentProgressRef = useRef<number>(0.0);
   const isMovingRef = useRef<boolean>(false);
+
+  // Mobile quotes carousel state
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState<number>(0);
+  const touchStartXRef = useRef<number | null>(null);
+
+  // Auto-rotate mobile quotes carousel gently
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentQuoteIndex((prev) => (prev + 1) % MOBILE_QUOTES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleQuoteTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleQuoteTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (Math.abs(deltaX) > 35) {
+      if (deltaX < 0) {
+        // Swiped left -> next quote
+        setCurrentQuoteIndex((prev) => (prev + 1) % MOBILE_QUOTES.length);
+      } else {
+        // Swiped right -> prev quote
+        setCurrentQuoteIndex((prev) => (prev - 1 + MOBILE_QUOTES.length) % MOBILE_QUOTES.length);
+      }
+    }
+    touchStartXRef.current = null;
+  };
+
+  // Mobile Trip Progress dynamic line calculation
+  const getMobileProgressWidth = () => {
+    if (selectedDestinationId === 'jaam-gate') return 'w-1/3';
+    if (selectedDestinationId === 'maheshwar') return 'w-2/3';
+    if (selectedDestinationId === 'sahastradhara') return 'w-full';
+    return 'w-0'; // Default: start at Indore
+  };
 
   // Animated bus position and state
   const [busState, setBusState] = useState<{
@@ -245,7 +290,7 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start pt-1 sm:pt-2">
             
             {/* Left Column: Title & Trip Metrics */}
-            <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4 max-w-xl">
+            <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4 max-w-xl relative z-30">
               {/* Tagline Pill */}
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 backdrop-blur-md w-fit">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -294,29 +339,19 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-0.5">
+              {/* Primary Action Button */}
+              <div className="flex items-center pt-0.5 sm:pt-1">
                 <button
                   onClick={onExploreRouteClick}
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#F5B027] text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 hover:bg-amber-300 transition-all shadow-[0_0_20px_rgba(245,176,39,0.35)] cursor-pointer"
+                  className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#F5B027] text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 hover:bg-amber-300 transition-all shadow-[0_0_20px_rgba(245,176,39,0.35)] cursor-pointer active:scale-95"
                 >
                   <span>Explore the Route</span>
                   <ArrowRightIcon size={15} />
                 </button>
-
-                <button
-                  onClick={() => handleDestinationTrigger('maheshwar')}
-                  className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#101b15]/80 hover:bg-[#182a21] border border-white/15 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all backdrop-blur-md cursor-pointer hover:border-amber-400/40"
-                >
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#F5B027] text-black flex items-center justify-center">
-                    <PlayIcon size={9} className="ml-0.5" />
-                  </div>
-                  <span>Watch Our Journey</span>
-                </button>
               </div>
 
               {/* Mobile Quick Destination Pills: Never cut off or clipped */}
-              <div className="grid grid-cols-3 gap-1.5 w-full max-w-md lg:hidden pt-1 z-20">
+              <div className="grid grid-cols-3 gap-1.5 w-full max-w-md lg:hidden pt-1 z-30">
                 {DESTINATIONS.map((dest) => {
                   const isActive = busState.activeTarget === dest.id || selectedDestinationId === dest.id;
                   return (
@@ -346,10 +381,10 @@ export const Hero: React.FC<HeroProps> = ({
               Center Column: Open Winding Road, Golden SVG Route, Floating Markers & Animated Bus
               Visible on both Mobile and Desktop with full responsive alignment.
             */}
-            <div className="w-full lg:col-span-3 flex flex-col justify-center items-center relative min-h-[300px] sm:min-h-[360px] lg:min-h-[380px] my-auto pointer-events-none select-none">
+            <div className="w-full lg:col-span-3 flex flex-col justify-center items-center relative z-20 min-h-[300px] sm:min-h-[360px] lg:min-h-[380px] my-auto pointer-events-none select-none">
               
               {/* Glowing Golden Route SVG Canvas */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                 <svg className="w-full h-full max-w-[340px] sm:max-w-[400px]" viewBox="0 0 200 400" fill="none">
                   <defs>
                     <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -362,8 +397,8 @@ export const Hero: React.FC<HeroProps> = ({
                   <path
                     d="M 60,380 Q 120,290 85,220 T 140,110 T 110,30"
                     stroke="#F5B027"
-                    strokeWidth="5"
-                    strokeOpacity="0.35"
+                    strokeWidth="5.5"
+                    strokeOpacity="0.45"
                     strokeLinecap="round"
                     filter="url(#routeGlow)"
                   />
@@ -374,9 +409,9 @@ export const Hero: React.FC<HeroProps> = ({
                     id="goldenRoutePath"
                     d="M 60,380 Q 120,290 85,220 T 140,110 T 110,30"
                     stroke="#F5B027"
-                    strokeWidth="3.2"
+                    strokeWidth="3.4"
                     strokeLinecap="round"
-                    className="filter drop-shadow-[0_0_8px_#facc15]"
+                    className="filter drop-shadow-[0_0_10px_#facc15]"
                   />
 
                   {/* Animated Golden Trail following behind the dot */}
@@ -453,23 +488,25 @@ export const Hero: React.FC<HeroProps> = ({
                   className={`absolute top-[16%] sm:top-[18%] right-2 sm:right-3 pointer-events-auto cursor-pointer group transition-all duration-300 ${
                     busState.activeTarget === 'sahastradhara' || selectedDestinationId === 'sahastradhara'
                       ? 'scale-105 z-30'
-                      : 'z-10'
+                      : 'z-20'
                   }`}
                   onClick={() => handleDestinationTrigger('sahastradhara')}
                   title="Travel to Sahastradhara"
+                  aria-label="Travel to Sahastradhara"
                 >
-                  <div className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
+                  <div className={`flex items-center gap-2 p-1 lg:px-3 lg:py-1.5 rounded-full lg:rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
                     busState.activeTarget === 'sahastradhara' || selectedDestinationId === 'sahastradhara'
                       ? 'border-amber-300 shadow-[0_0_20px_#fbbf24] ring-2 ring-amber-400/50'
                       : 'border-amber-400/50 group-hover:border-amber-300 group-hover:scale-105'
                   }`}>
-                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
+                    <div className="relative w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
                       <img src={sahastradhara.thumbnail} alt={sahastradhara.name} className="w-full h-full object-cover" />
                       {busState.activeTarget === 'sahastradhara' && busState.isMoving && (
                         <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
                       )}
                     </div>
-                    <div className="flex flex-col text-left">
+                    {/* Floating label: Hidden on mobile to avoid duplicating top destination cards, visible on desktop */}
+                    <div className="hidden lg:flex flex-col text-left pr-1">
                       <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 leading-tight">
                         {sahastradhara.name}
                       </span>
@@ -487,23 +524,25 @@ export const Hero: React.FC<HeroProps> = ({
                   className={`absolute top-[46%] sm:top-[48%] right-4 sm:right-6 pointer-events-auto cursor-pointer group transition-all duration-300 ${
                     busState.activeTarget === 'maheshwar' || selectedDestinationId === 'maheshwar'
                       ? 'scale-105 z-30'
-                      : 'z-10'
+                      : 'z-20'
                   }`}
                   onClick={() => handleDestinationTrigger('maheshwar')}
                   title="Travel to Maheshwar"
+                  aria-label="Travel to Maheshwar"
                 >
-                  <div className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
+                  <div className={`flex items-center gap-2 p-1 lg:px-3 lg:py-1.5 rounded-full lg:rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
                     busState.activeTarget === 'maheshwar' || selectedDestinationId === 'maheshwar'
                       ? 'border-amber-300 shadow-[0_0_20px_#fbbf24] ring-2 ring-amber-400/50'
                       : 'border-amber-400/50 group-hover:border-amber-300 group-hover:scale-105'
                   }`}>
-                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
+                    <div className="relative w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
                       <img src={maheshwar.thumbnail} alt={maheshwar.name} className="w-full h-full object-cover" />
                       {busState.activeTarget === 'maheshwar' && busState.isMoving && (
                         <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
                       )}
                     </div>
-                    <div className="flex flex-col text-left">
+                    {/* Floating label: Hidden on mobile to avoid duplicating top destination cards, visible on desktop */}
+                    <div className="hidden lg:flex flex-col text-left pr-1">
                       <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 leading-tight">
                         {maheshwar.name}
                       </span>
@@ -521,23 +560,25 @@ export const Hero: React.FC<HeroProps> = ({
                   className={`absolute top-[72%] sm:top-[75%] right-1 sm:right-2 pointer-events-auto cursor-pointer group transition-all duration-300 ${
                     busState.activeTarget === 'jaam-gate' || selectedDestinationId === 'jaam-gate'
                       ? 'scale-105 z-30'
-                      : 'z-10'
+                      : 'z-20'
                   }`}
                   onClick={() => handleDestinationTrigger('jaam-gate')}
                   title="Travel to Jaam Gate"
+                  aria-label="Travel to Jaam Gate"
                 >
-                  <div className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
+                  <div className={`flex items-center gap-2 p-1 lg:px-3 lg:py-1.5 rounded-full lg:rounded-2xl bg-[#0c1611]/90 backdrop-blur-md border shadow-xl transition-all ${
                     busState.activeTarget === 'jaam-gate' || selectedDestinationId === 'jaam-gate'
                       ? 'border-amber-300 shadow-[0_0_20px_#fbbf24] ring-2 ring-amber-400/50'
                       : 'border-amber-400/50 group-hover:border-amber-300 group-hover:scale-105'
                   }`}>
-                    <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
+                    <div className="relative w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-amber-400 shrink-0">
                       <img src={jaamGate.thumbnail} alt={jaamGate.name} className="w-full h-full object-cover" />
                       {busState.activeTarget === 'jaam-gate' && busState.isMoving && (
                         <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
                       )}
                     </div>
-                    <div className="flex flex-col text-left">
+                    {/* Floating label: Hidden on mobile to avoid duplicating top destination cards, visible on desktop */}
+                    <div className="hidden lg:flex flex-col text-left pr-1">
                       <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-amber-300 leading-tight">
                         {jaamGate.name}
                       </span>
@@ -735,54 +776,84 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="glass-panel rounded-2xl p-4 border border-amber-500/20 shadow-xl">
             <h3 className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-3 flex items-center justify-between">
               <span>Trip Progress</span>
-              <span className="text-[10px] font-mono text-neutral-400">Indore → Maheshwar</span>
+              <span className="text-[10px] font-mono text-amber-300/85 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                Start: Indore (0 km)
+              </span>
             </h3>
             
             <div className="relative flex items-center justify-between px-1">
-              <div className="absolute left-2.5 right-2.5 top-2 h-0.5 bg-neutral-700 -z-0" />
-              <div className="absolute left-2.5 w-3/4 top-2 h-0.5 bg-gradient-to-r from-amber-400 to-amber-300 -z-0 shadow-[0_0_8px_#facc15]" />
+              <div className="absolute left-3 right-3 top-2.5 h-0.5 bg-neutral-800 -z-0" />
+              {getMobileProgressWidth() !== 'w-0' && (
+                <div className={`absolute left-3 ${getMobileProgressWidth()} top-2.5 h-0.5 bg-gradient-to-r from-amber-400 to-amber-300 -z-0 shadow-[0_0_8px_#facc15] transition-all duration-500`} />
+              )}
 
+              {/* Stop 1: Indore (Current Starting Point) */}
               <div className="relative z-10 flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-amber-400 border-2 border-white flex items-center justify-center text-[8px] font-bold text-black shadow">
+                <div className="w-5 h-5 rounded-full bg-amber-400 border-2 border-white flex items-center justify-center text-[8.5px] font-bold text-black shadow-[0_0_10px_#facc15] ring-2 ring-amber-400/40">
                   1
                 </div>
-                <span className="text-[9px] text-white font-medium mt-1">Indore</span>
+                <span className="text-[9px] text-amber-300 font-bold mt-1">Indore</span>
+                <span className="text-[7.5px] font-mono text-neutral-400">Start (0 km)</span>
               </div>
 
+              {/* Stop 2: Jaam Gate */}
               <div
                 className="relative z-10 flex flex-col items-center cursor-pointer group"
                 onClick={() => handleDestinationTrigger('jaam-gate')}
               >
-                <div className={`w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold shadow ${
-                  selectedDestinationId === 'jaam-gate' ? 'bg-amber-300 scale-125 text-black' : 'bg-amber-400 text-black'
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center text-[8px] font-bold transition-all ${
+                  selectedDestinationId === 'jaam-gate'
+                    ? 'bg-amber-300 border-white text-black scale-125 shadow-[0_0_10px_#facc15]'
+                    : 'bg-neutral-800 border-neutral-600 text-neutral-400 group-hover:border-amber-400 group-hover:text-white'
                 }`}>
                   2
                 </div>
-                <span className="text-[9px] text-white group-hover:text-amber-300 font-medium mt-1">Jaam Gate</span>
+                <span className={`text-[9px] font-medium mt-1 transition-colors ${
+                  selectedDestinationId === 'jaam-gate' ? 'text-amber-300 font-bold' : 'text-neutral-400 group-hover:text-amber-300'
+                }`}>
+                  Jaam Gate
+                </span>
+                <span className="text-[7.5px] font-mono text-neutral-500">50 km</span>
               </div>
 
+              {/* Stop 3: Maheshwar */}
               <div
                 className="relative z-10 flex flex-col items-center cursor-pointer group"
                 onClick={() => handleDestinationTrigger('maheshwar')}
               >
-                <div className={`w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold shadow ${
-                  selectedDestinationId === 'maheshwar' ? 'bg-amber-300 scale-125 text-black' : 'bg-amber-400 text-black'
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center text-[8px] font-bold transition-all ${
+                  selectedDestinationId === 'maheshwar'
+                    ? 'bg-amber-300 border-white text-black scale-125 shadow-[0_0_10px_#facc15]'
+                    : 'bg-neutral-800 border-neutral-600 text-neutral-400 group-hover:border-amber-400 group-hover:text-white'
                 }`}>
                   3
                 </div>
-                <span className="text-[9px] text-white group-hover:text-amber-300 font-medium mt-1">Maheshwar</span>
+                <span className={`text-[9px] font-medium mt-1 transition-colors ${
+                  selectedDestinationId === 'maheshwar' ? 'text-amber-300 font-bold' : 'text-neutral-400 group-hover:text-amber-300'
+                }`}>
+                  Maheshwar
+                </span>
+                <span className="text-[7.5px] font-mono text-neutral-500">100 km</span>
               </div>
 
+              {/* Stop 4: Sahastradhara */}
               <div
                 className="relative z-10 flex flex-col items-center cursor-pointer group"
                 onClick={() => handleDestinationTrigger('sahastradhara')}
               >
-                <div className={`w-4 h-4 rounded-full border-2 border-neutral-600 flex items-center justify-center text-[8px] font-bold ${
-                  selectedDestinationId === 'sahastradhara' ? 'bg-amber-400 border-white text-black scale-125' : 'bg-neutral-800 text-neutral-400'
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center text-[8px] font-bold transition-all ${
+                  selectedDestinationId === 'sahastradhara'
+                    ? 'bg-amber-300 border-white text-black scale-125 shadow-[0_0_10px_#facc15]'
+                    : 'bg-neutral-800 border-neutral-600 text-neutral-400 group-hover:border-amber-400 group-hover:text-white'
                 }`}>
                   4
                 </div>
-                <span className="text-[9px] text-neutral-300 group-hover:text-amber-300 font-medium mt-1">Sahastradhara</span>
+                <span className={`text-[9px] font-medium mt-1 transition-colors ${
+                  selectedDestinationId === 'sahastradhara' ? 'text-amber-300 font-bold' : 'text-neutral-400 group-hover:text-amber-300'
+                }`}>
+                  Sahastradhara
+                </span>
+                <span className="text-[7.5px] font-mono text-neutral-500">110 km</span>
               </div>
             </div>
           </div>
@@ -835,14 +906,72 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
           </div>
 
-          {/* Mobile Card 3: Quote Card */}
-          <div className="glass-panel rounded-2xl p-4 border border-amber-500/20 shadow-xl relative overflow-hidden">
+          {/* Mobile Card 3: Inspiring Quotes Carousel */}
+          <div
+            className="glass-panel rounded-2xl p-4 border border-amber-500/20 shadow-xl relative overflow-hidden select-none"
+            onTouchStart={handleQuoteTouchStart}
+            onTouchEnd={handleQuoteTouchEnd}
+            aria-roledescription="carousel"
+            aria-label="Inspiring travel quotes"
+          >
             <div className="text-amber-400/20 absolute right-2.5 top-0.5 pointer-events-none">
               <QuoteIcon size={44} />
             </div>
-            <p className="text-sm font-serif italic text-amber-200/95 leading-relaxed relative z-10">
-              “Good roads lead to great stories.”
-            </p>
+
+            <div className="relative z-10 flex flex-col min-h-[64px] justify-between">
+              {/* Quote item with smooth slide / fade transition */}
+              <div className="relative overflow-hidden min-h-[44px] flex items-center">
+                <p
+                  key={currentQuoteIndex}
+                  className="text-sm font-serif italic text-amber-200/95 leading-relaxed transition-all duration-300 ease-out"
+                >
+                  {MOBILE_QUOTES[currentQuoteIndex]}
+                </p>
+              </div>
+
+              {/* Carousel Indicators and Navigation */}
+              <div className="flex items-center justify-between pt-2.5 border-t border-white/5 mt-1.5">
+                <div className="flex items-center gap-1.5">
+                  {MOBILE_QUOTES.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCurrentQuoteIndex(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        currentQuoteIndex === idx
+                          ? 'w-5 bg-amber-400 shadow-[0_0_6px_#fbbf24]'
+                          : 'w-1.5 bg-white/20 hover:bg-white/40'
+                      }`}
+                      aria-label={`Go to quote ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[8.5px] font-mono text-neutral-400 tracking-wider uppercase">
+                    {currentQuoteIndex + 1} / {MOBILE_QUOTES.length} • Swipe
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentQuoteIndex((prev) => (prev - 1 + MOBILE_QUOTES.length) % MOBILE_QUOTES.length)}
+                      className="w-5 h-5 rounded-full bg-white/5 hover:bg-white/10 text-neutral-300 flex items-center justify-center transition-colors text-xs leading-none"
+                      aria-label="Previous quote"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentQuoteIndex((prev) => (prev + 1) % MOBILE_QUOTES.length)}
+                      className="w-5 h-5 rounded-full bg-white/5 hover:bg-white/10 text-neutral-300 flex items-center justify-center transition-colors text-xs leading-none"
+                      aria-label="Next quote"
+                    >
+                      ›
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Mobile Card 4: Interactive Route Map Panel */}
