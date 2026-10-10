@@ -37,7 +37,7 @@ export const RouteMapPanel: React.FC<RouteMapPanelProps> = ({
     {
       id: 'indore',
       name: 'Indore',
-      distanceLabel: 'Start',
+      distanceLabel: 'Start (0 km)',
       x: 28,
       y: 88
     }
@@ -110,9 +110,7 @@ export const RouteMapPanel: React.FC<RouteMapPanelProps> = ({
                   left: `${stop.x}%`
                 }}
                 onClick={() => {
-                  if (!isIndore) {
-                    onSelectDestination(stop.id);
-                  }
+                  onSelectDestination(stop.id);
                 }}
               >
                 {/* Marker Dot */}
