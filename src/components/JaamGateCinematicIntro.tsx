@@ -15,8 +15,8 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
 }) => {
   const [phase, setPhase] = useState<IntroPhase>('approach');
   const [progress, setProgress] = useState<number>(0);
+  const [isMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 640);
   const hasFinishedRef = useRef<boolean>(false);
-  const isMobileRef = useRef<boolean>(false);
 
   // Safe single-trigger completion / skip handler
   const handleFinish = useCallback((isSkip = false) => {
@@ -38,9 +38,6 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
       handleFinish(true);
       return;
     }
-
-    isMobileRef.current = typeof window !== 'undefined' && window.innerWidth < 640;
-    const isMobile = isMobileRef.current;
 
     // Timeline duration (shorter on mobile for snappy experience)
     const approachDuration = isMobile ? 1200 : 1500;
@@ -98,11 +95,14 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
       cancelAnimationFrame(animId);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleFinish]);
+  }, [handleFinish, isMobile]);
 
-  // Optical center of Jaam Gate archway in jaam_gate_approach.jpg (1024x576)
-  // X: ~46.5%, Y: ~69.0%
-  const archCenterOrigin = '46.5% 69.0%';
+  // Exact visual center of the inner arch OPENING in jaam_gate_approach.jpg (1024x576)
+  // Horizontal center of archway opening: ~45.6%
+  // Vertical center of through-arch opening (sky/valley portal): ~76.0%
+  const archFocalX = '45.6%';
+  const archFocalY = '76.0%';
+  const archCenterOrigin = `${archFocalX} ${archFocalY}`;
 
   return (
     <motion.div
@@ -116,18 +116,18 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
     >
       {/* 
         LAYER 1: The Beyond Valley Vista (public/assets/jaam-gate/jam_gate_indore.jpg)
-        Positioned behind the archway; revealed fully as the camera breaks through the portal.
+        Revealed strictly AFTER the viewer crosses the arch threshold (phase === 'passThrough').
       */}
       <motion.div
         className="absolute inset-0 w-full h-full overflow-hidden"
-        initial={{ scale: 1.25, opacity: 0 }}
+        initial={{ scale: 1.15, opacity: 0 }}
         animate={{
-          scale: phase === 'passThrough' || phase === 'reveal' ? 1.02 : 1.15,
-          opacity: phase === 'passThrough' ? 0.95 : phase === 'reveal' ? 1 : 0.15,
-          filter: phase === 'reveal' ? 'brightness(1) contrast(1.05)' : 'brightness(0.9) contrast(1)'
+          scale: phase === 'reveal' ? 1.0 : phase === 'passThrough' ? 1.05 : 1.15,
+          opacity: phase === 'passThrough' || phase === 'reveal' ? 1 : 0,
+          filter: phase === 'reveal' ? 'brightness(1) contrast(1.05)' : 'brightness(0.95) contrast(1)'
         }}
         transition={{
-          duration: phase === 'passThrough' ? 1.2 : 1.5,
+          duration: phase === 'passThrough' ? (isMobile ? 0.9 : 1.2) : 1.4,
           ease: [0.16, 1, 0.3, 1]
         }}
       >
@@ -144,29 +144,65 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
 
       {/* 
         LAYER 2: Foreground Gate Approach Plate (public/assets/jaam-gate/jaam_gate_approach.jpg)
-        Smooth camera dolly pushing straight toward the arch opening with transformOrigin on the arch.
-        Scale is capped at 2.65 to guarantee zero visible pixelation or artifacting.
+        - Starts from a lower road-level perspective so the road naturally leads into the arch opening.
+        - Zooms directly toward the center of the arch OPENING (45.6% 76.0%).
+        - Passes forward through the arch threshold, moving the stone frame past the viewport edges.
       */}
       <motion.div
-        className="absolute inset-0 w-full h-full origin-[46.5%_69.0%]"
+        className="absolute inset-0 w-full h-full"
         style={{ transformOrigin: archCenterOrigin }}
-        initial={{ scale: 1.0, opacity: 1 }}
+        initial={{ scale: 1.0, y: '3.5%', opacity: 1 }}
         animate={{
           scale:
             phase === 'approach'
-              ? 1.05
+              ? 1.14
               : phase === 'zoom'
               ? 2.65
-              : 4.8, // Smooth pass-through expansion
+              : 4.8, // Moves stone frame past viewport edges
+          y:
+            phase === 'approach'
+              ? '1.5%'
+              : phase === 'zoom'
+              ? '-2%'
+              : '-5%',
+          x:
+            phase === 'approach'
+              ? '0%'
+              : phase === 'zoom'
+              ? '1%'
+              : '2%',
           opacity: phase === 'passThrough' || phase === 'reveal' ? 0 : 1
         }}
         transition={{
           scale: {
-            duration: phase === 'approach' ? 1.5 : phase === 'zoom' ? 1.7 : 1.1,
+            duration:
+              phase === 'approach'
+                ? (isMobile ? 1.2 : 1.5)
+                : phase === 'zoom'
+                ? (isMobile ? 1.3 : 1.7)
+                : (isMobile ? 0.9 : 1.2),
             ease: phase === 'zoom' ? [0.25, 0.1, 0.25, 1] : [0.4, 0, 0.2, 1]
           },
+          y: {
+            duration:
+              phase === 'approach'
+                ? (isMobile ? 1.2 : 1.5)
+                : phase === 'zoom'
+                ? (isMobile ? 1.3 : 1.7)
+                : (isMobile ? 0.9 : 1.2),
+            ease: 'easeInOut'
+          },
+          x: {
+            duration:
+              phase === 'approach'
+                ? (isMobile ? 1.2 : 1.5)
+                : phase === 'zoom'
+                ? (isMobile ? 1.3 : 1.7)
+                : (isMobile ? 0.9 : 1.2),
+            ease: 'easeInOut'
+          },
           opacity: {
-            duration: phase === 'passThrough' ? 0.85 : 0.4,
+            duration: phase === 'passThrough' ? (isMobile ? 0.8 : 1.0) : 0.4,
             ease: 'easeInOut'
           }
         }}
@@ -174,7 +210,8 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
         <img
           src="/assets/jaam-gate/jaam_gate_approach.jpg"
           alt="Historic Jaam Gate front approach along the mountain highway"
-          className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.04]"
+          style={{ objectPosition: `${archFocalX} ${archFocalY}` }}
+          className="w-full h-full object-cover filter brightness-[0.98] contrast-[1.04]"
         />
 
         {/* Ambient shadow gradient blending the gate facade into the atmosphere */}
@@ -189,16 +226,16 @@ export const JaamGateCinematicIntro: React.FC<JaamGateCinematicIntroProps> = ({
         className="absolute inset-0 pointer-events-none bg-radial from-amber-300/80 via-amber-500/25 to-transparent mix-blend-screen"
         initial={{ opacity: 0 }}
         animate={{
-          opacity: phase === 'passThrough' ? [0, 0.85, 0.15] : 0
+          opacity: phase === 'passThrough' ? [0, 0.9, 0] : 0
         }}
-        transition={{ duration: 1.0, ease: 'easeOut' }}
+        transition={{ duration: isMobile ? 0.9 : 1.1, ease: 'easeOut' }}
       />
 
       {/* Dark arch aperture vignette to simulate the stone vault framing the screen */}
       <motion.div
-        className="absolute inset-0 pointer-events-none border-[18px] sm:border-[28px] border-black/40 rounded-[28px] sm:rounded-[40px] shadow-[inset_0_0_80px_rgba(0,0,0,0.85)]"
+        className="absolute inset-0 pointer-events-none border-[18px] sm:border-[28px] border-black/50 rounded-[28px] sm:rounded-[40px] shadow-[inset_0_0_90px_rgba(0,0,0,0.85)]"
         animate={{
-          opacity: phase === 'zoom' ? 0.7 : phase === 'passThrough' ? 0.2 : 0
+          opacity: phase === 'zoom' ? 0.75 : phase === 'passThrough' ? 0.2 : 0
         }}
         transition={{ duration: 0.8 }}
       />
