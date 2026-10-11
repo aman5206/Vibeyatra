@@ -1,18 +1,38 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'motion/react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { DestinationDetailPopover } from './components/DestinationDetailPopover';
+import { JaamGateCinematicIntro } from './components/JaamGateCinematicIntro';
 import { DESTINATIONS } from './data/travelData';
 import type { NavTabId } from './types/travel';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<NavTabId>('home');
   const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null);
+  const [isJaamGateIntroActive, setIsJaamGateIntroActive] = useState<boolean>(false);
 
   const selectedDestination = DESTINATIONS.find((d) => d.id === selectedDestinationId) || null;
 
   const handleSelectDestination = (id: string | null) => {
-    setSelectedDestinationId(id);
+    if (id === 'jaam-gate') {
+      // Cinematic intro plays first when Jaam Gate is reached
+      setIsJaamGateIntroActive(true);
+      setSelectedDestinationId(null);
+    } else {
+      setIsJaamGateIntroActive(false);
+      setSelectedDestinationId(id);
+    }
+  };
+
+  const handleIntroComplete = () => {
+    setIsJaamGateIntroActive(false);
+    setSelectedDestinationId('jaam-gate');
+  };
+
+  const handleReplayIntro = () => {
+    setSelectedDestinationId(null);
+    setIsJaamGateIntroActive(true);
   };
 
   const scrollToDestinations = () => {
@@ -67,10 +87,21 @@ export function App() {
         © {new Date().getFullYear()} Vibeyatra • Indore • Jaam Gate • Maheshwar • Sahastradhara
       </footer>
 
+      {/* Jaam Gate Full-Screen Cinematic Intro */}
+      <AnimatePresence>
+        {isJaamGateIntroActive && (
+          <JaamGateCinematicIntro
+            onComplete={handleIntroComplete}
+            onSkip={handleIntroComplete}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Destination Anchored Detail Popover */}
       <DestinationDetailPopover
         destination={selectedDestination}
         onClose={() => setSelectedDestinationId(null)}
+        onReplayIntro={handleReplayIntro}
       />
     </div>
   );

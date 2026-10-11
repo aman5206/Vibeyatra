@@ -6,18 +6,21 @@ import {
   Maximize2Icon,
   MapPinIcon,
   SparklesIcon,
-  CameraIcon
+  CameraIcon,
+  RotateCcwIcon
 } from './Icons';
 import type { Destination, GalleryImage } from '../types/travel';
 
 interface DestinationDetailPopoverProps {
   destination: Destination | null;
   onClose: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const DestinationDetailPopover: React.FC<DestinationDetailPopoverProps> = ({
   destination,
-  onClose
+  onClose,
+  onReplayIntro
 }) => {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -114,13 +117,27 @@ export const DestinationDetailPopover: React.FC<DestinationDetailPopoverProps> =
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="p-1.5 sm:p-2 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer shrink-0"
-              aria-label="Close detail panel"
-            >
-              <XIcon size={18} className="sm:w-5 sm:h-5" />
-            </button>
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {isJaamGate && onReplayIntro && (
+                <button
+                  onClick={onReplayIntro}
+                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-500/15 hover:bg-amber-400 hover:text-black border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0"
+                  title="Replay cinematic intro through the gate"
+                  aria-label="Replay cinematic intro"
+                >
+                  <RotateCcwIcon size={12} className="sm:w-3.5 sm:h-3.5" />
+                  <span>Replay Intro</span>
+                </button>
+              )}
+
+              <button
+                onClick={onClose}
+                className="p-1.5 sm:p-2 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer shrink-0"
+                aria-label="Close detail panel"
+              >
+                <XIcon size={18} className="sm:w-5 sm:h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Modal Body */}
