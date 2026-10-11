@@ -531,7 +531,7 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Destination Marker: Maheshwar (Middle point along road) */}
               {maheshwar && (
                 <div
-                  className={`absolute top-[38%] right-2 sm:right-4 lg:top-[46%] lg:right-6 pointer-events-auto cursor-pointer group transition-all duration-300 ${
+                  className={`absolute top-[34%] left-[48%] sm:left-[50%] lg:left-auto lg:top-[46%] lg:right-6 pointer-events-auto cursor-pointer group transition-all duration-300 ${
                     busState.activeTarget === 'maheshwar' || selectedDestinationId === 'maheshwar'
                       ? 'scale-105 z-30'
                       : 'z-20'
@@ -567,7 +567,7 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Destination Marker: Jaam Gate (Lower point along road) */}
               {jaamGate && (
                 <div
-                  className={`absolute top-[68%] right-2 sm:right-4 lg:top-[72%] lg:right-1 pointer-events-auto cursor-pointer group transition-all duration-300 ${
+                  className={`absolute top-[64%] left-[46%] sm:left-[48%] lg:left-auto lg:top-[72%] lg:right-1 pointer-events-auto cursor-pointer group transition-all duration-300 ${
                     busState.activeTarget === 'jaam-gate' || selectedDestinationId === 'jaam-gate'
                       ? 'scale-105 z-30'
                       : 'z-20'
